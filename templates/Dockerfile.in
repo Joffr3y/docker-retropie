@@ -1,0 +1,40 @@
+FROM @FROM@
+LABEL maintainer="@MAINTAINER@"
+
+ENV USER="@USER@"
+ENV HOME="@HOME@"
+ENV UID=@UID@
+
+ENV __user="$USER"
+ENV TERM="xterm"
+ENV TZ="@TZ@"
+
+ADD depends.cfg /tmp
+
+RUN cd /tmp && \
+    echo "$TZ" > /etc/timezone && \
+    ln -snf "/usr/share/zoneinfo/$TZ" /etc/localtime && \
+\
+    apt-get update && \
+    apt-get install -y $(cut -d'#' -f1 depends.cfg)
+
+RUN groupmod -g @INPUT_GID@ input && \
+    groupmod -g @AUDIO_GID@ audio && \
+    groupmod -g @VIDEO_GID@ video && \
+    useradd -m "$USER" -u "$UID" -G input,audio,video -s /bin/bash && \
+\
+    { \
+        echo '#!/bin/bash' ;\
+        echo '/opt/retropie/supplementary/emulationstation/emulationstation "$@"' ;\
+    } > /usr/local/bin/emulationstation && \
+    { \
+        echo '#!/bin/bash' ;\
+        echo '/opt/retropie/emulators/retroarch/bin/retroarch "$@"' ;\
+    } > /usr/local/bin/retroarch && \
+\
+    chmod 755 /usr/local/bin/* && \
+    rm -rf /var/lib/apt/lists/* /tmp/*
+
+USER "$USER"
+WORKDIR "$HOME"
+CMD @CMD@

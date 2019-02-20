@@ -1,0 +1,24 @@
+services:
+  retropie:
+    build:
+      context: .
+    devices:
+    - /dev/dri    # Video
+    - /dev/snd    # Sound
+    - /dev/input  # Keyboard/Gamepad
+    environment:
+      TERM:
+      DISPLAY:
+      XAUTHORITY:
+    image: @IMG@
+    network_mode: host
+    volumes:
+    - /tmp/.X11-unix:/tmp/.X11-unix:ro
+    - /tmp/xauth-@UID@-_0:/tmp/xauth-@UID@-_0:ro
+    - /run/udev:/run/udev:ro
+    - @GITDIR@/opt/scripts:/opt/scripts:rw
+    - @GITDIR@/opt/retropie:/opt/retropie:rw
+    - @GITDIR@/datas:@HOME@:rw
+    - @GITDIR@/datas/emulationstation:/etc/emulationstation:rw
+    - @GITDIR@/datas/emulationstation:@HOME@/.emulationstation:rw
+version: '3.0'
