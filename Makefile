@@ -58,6 +58,7 @@ get-setup-scripts:
 	    $(SED) \
 	        -e 's|"$$(id -u)" -ne 0|0 -ne 0|g' \
 	     -E -e 's/(sudo|su)(\s"?\$$user"?|\s-{1,2}[[:alpha:]]+){0,2}\s//g' \
+	        -e '/\/retroarch\/bin\/retroarch/s/["\]+//g' \
 	        -i {} \;
 	@printf 'Done\n'
 
