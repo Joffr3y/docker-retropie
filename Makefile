@@ -55,11 +55,17 @@ get-setup-scripts:
 	fi
 	@printf 'Remove all su/sudo call... '
 	@find ./opt/scripts -name "*.sh" -type f -exec \
-	    $(SED) \
-	        -e 's|"$$(id -u)" -ne 0|0 -ne 0|g' \
-	     -E -e 's/(sudo|su)(\s"?\$$user"?|\s-{1,2}[[:alpha:]]+){0,2}\s//g' \
-	        -e '/\/retroarch\/bin\/retroarch/s/["\]+//g' \
-	        -i {} \;
+	$(SED) \
+	    -E -e 's/(sudo|su)(\s"?\$$user"?|\s-{1,2}[[:alpha:]]+){0,2}\s//g' \
+	    -i {} \;
+	@$(SED) \
+	    -e 's|"$$(id -u)" -ne 0|0 -ne 0|g' \
+	    -i ./opt/scripts/retropie_packages.sh
+	@printf 'Done\n'
+	@printf 'Fix run retroarch from retropiemenu... '
+	@$(SED) \
+	    -E '/\/retroarch\/bin\/retroarch/s/["\]+//g' \
+	    -i ./opt/scripts/scriptmodules/supplementary/retropiemenu.sh
 	@printf 'Done\n'
 
 # Build retropie with docker
