@@ -54,8 +54,7 @@ get-setup-scripts:
 	    git clone --depth=1 $(GIT) scripts ;\
 	fi
 	@printf 'Remove all su/sudo call... '
-	@find ./opt/scripts -name "*.sh" -type f -exec \
-	$(SED) \
+	@find ./opt/scripts -name "*.sh" -type f -exec $(SED) \
 	    -E -e 's/(sudo|su)(\s"?\$$user"?|\s-{1,2}[[:alpha:]]+){0,2}\s//g' \
 	    -i {} \;
 	@$(SED) \
@@ -90,16 +89,18 @@ check-deps:
 run:
 	@docker-compose run --rm retropie emulationstation
 
-# Clean
+# Remove built files
 clean:
 	@rm -f ./Dockerfile ./docker-compose.yml
 
-# Show this help prompt
+# Show this help
 help:
-	@echo '  Usage:'
-	@echo '    make <target>'
+	@echo 'Usage: make [VAR=VALUE] [TARGET]'
 	@echo
-	@echo '  Targets:'
-	@awk '/^#/{ comment = substr($$0,3) } comment && /^[a-zA-Z][a-zA-Z0-9_-]+ ?:/{ print "   ", $$1, comment }' $(MAKEFILE_LIST) | column -t -s ':'
+	@echo 'Targets:'
+	@awk  '/^#/{h=substr($$0,3)} h && /^[[:alpha:]_-]+\s?:/{print " ", $$1, h}' $(MAKEFILE_LIST) | column -ts ':'
+	@echo
+	@echo 'Variables:'
+	@grep -Eo '^[[:alpha:]_]+\s+[^=]' $(MAKEFILE_LIST) | $(SED) 's/^/  /'
 
 .PHONY: all image get-setup-scripts retropie check-deps run clean help
